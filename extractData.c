@@ -92,7 +92,7 @@ void freeMemory() {
   for (int i = 0; i < NB_FILMS; i++) {
     
     if (Films[i] != NULL) {
-
+      /*
       mark* currentMark = Films[i]->head;
       mark* nextMark = NULL;
 
@@ -107,14 +107,13 @@ void freeMemory() {
         currentMark = nextMark;
         nextMark = nextMark->sameFilm;
       }
-
+      */
       free(Films[i]);
       Films[i] = NULL;
-
     }
 
   }
-
+  
   for (int i = 0; i < NB_USERS; i++) {
     
     if (Users[i] != NULL) {
@@ -136,8 +135,9 @@ int main(int argc, char* argv[]) {
   initializeFilms();
   initializeUsers();
   readData("testFile.txt");
-  displayFilms();
-  displayUsers();
+  // displayFilms();
+  // displayUsers();
+  freeMemory();
 
   return 0;
 
