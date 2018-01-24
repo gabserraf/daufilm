@@ -4,11 +4,26 @@
 
 #include "lib.h"
 
+/*
+ * FUNCTIONS
+ */
+
+/**
+ * TODO
+ * @param msg
+ */
 void throwError(char msg[T_MAX]) {
   printf("[Daufilm] Error: %s", msg);
   exit(0);
 }
 
+/**
+ * TODO
+ * @param markValue
+ * @param idFilm
+ * @param idUser
+ * @return 
+ */
 mark* initializeMark(int markValue, int idFilm, int idUser) {
   
   mark* new_mark = malloc(sizeof(mark));
@@ -25,6 +40,10 @@ mark* initializeMark(int markValue, int idFilm, int idUser) {
 
 }
 
+/**
+ * TODO
+ * @return
+ */
 list* initializeList() {
 
   list* new_list = malloc(sizeof(list));
@@ -37,6 +56,12 @@ list* initializeList() {
 
 }
 
+/**
+ * TODO
+ * @param m1
+ * @param m2
+ * @return
+ */
 mark* findSimilarity(mark* m1, mark* m2) {
 
   if (m2 == NULL || m1->idFilm == m2->idFilm || m1->idUser == m2->idUser) {
@@ -53,6 +78,12 @@ mark* findSimilarity(mark* m1, mark* m2) {
 
 }
 
+/**
+ * TODO
+ * @param l
+ * @param m
+ * @return
+ */
 list* addList(list* l, mark* m) {
 
   mark* head = l->head;
@@ -81,6 +112,9 @@ list* addList(list* l, mark* m) {
 
 }
 
+/**
+ * TODO
+ */
 void displayFilms() {
   
   printf("Films list : \n");
@@ -101,6 +135,9 @@ void displayFilms() {
   
 }
 
+/**
+ * TODO
+ */
 void displayUsers() {
   
   printf("Users list : \n");

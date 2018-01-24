@@ -4,6 +4,9 @@
 
 #include "lib.h"
 
+/**
+ * TODO
+ */
 void initializeFilms() {
 
   for (int i = 0; i < NB_FILMS; i++) {
@@ -12,6 +15,9 @@ void initializeFilms() {
 
 }
 
+/**
+ * TODO
+ */
 void initializeUsers() {
 
   for (int i = 0; i < NB_USERS; i++) {
@@ -20,6 +26,10 @@ void initializeUsers() {
 
 }
 
+/**
+ * TODO
+ * @param filename
+ */
 void readData(char filename[T_MAX]) {
 
   /*
@@ -87,6 +97,9 @@ void readData(char filename[T_MAX]) {
 
 }
 
+/**
+ * TODO
+ */
 void freeMemory() {
 
   for (int i = 0; i < NB_FILMS; i++) {
@@ -126,7 +139,6 @@ void freeMemory() {
   }
 
 }
-
 
 /* MAIN */
 
