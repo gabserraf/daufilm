@@ -46,6 +46,7 @@ mark* findSimilarity(mark* m1, mark* m2);
 list* addList(list* l, mark* m);
 void displayFilms();
 void displayUsers();
+void displayMark(mark* m);
 
 /* extractData.c */
 

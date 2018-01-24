@@ -120,3 +120,9 @@ void displayUsers() {
   }
   
 }
+
+void displayMark(mark* m) {
+
+  printf("Value=%d;\tidFilm=%d;\tidUser=%d\n", m->markValue, m->idFilm, m->idUser);
+
+}

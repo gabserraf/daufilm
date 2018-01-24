@@ -46,7 +46,7 @@ void readData(char filename[T_MAX]) {
   file = fopen(filename, "r");
 
   if (file == NULL) throwError("File doesn't exist");
-
+  
   while ((read = getline(&line, &len, file)) != -1) {
     
     if (strstr(line, ":")) {
@@ -76,13 +76,14 @@ void readData(char filename[T_MAX]) {
     }
 
     Films[idFilm-1] = filmList;
-
+    
   }
 
   /*
    * end & return
    */
 
+  free(line);
   fclose(file);
 
 }
@@ -92,7 +93,7 @@ void freeMemory() {
   for (int i = 0; i < NB_FILMS; i++) {
     
     if (Films[i] != NULL) {
-      /*
+
       mark* currentMark = Films[i]->head;
       mark* nextMark = NULL;
 
@@ -103,13 +104,14 @@ void freeMemory() {
       }
 
       while (nextMark != NULL) {
-        free(currentMark);
         currentMark = nextMark;
+        free(currentMark);
         nextMark = nextMark->sameFilm;
       }
-      */
+
       free(Films[i]);
       Films[i] = NULL;
+
     }
 
   }
