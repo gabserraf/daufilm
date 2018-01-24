@@ -4,6 +4,10 @@
 
 #include "lib.h"
 
+/*
+ * FUNCTIONS
+ */
+
 /**
  * TODO
  */
@@ -95,63 +99,5 @@ void readData(char filename[T_MAX]) {
 
   free(line);
   fclose(file);
-
-}
-
-/**
- * TODO
- */
-void freeMemory() {
-
-  for (int i = 0; i < NB_FILMS; i++) {
-    
-    if (Films[i] != NULL) {
-
-      mark* currentMark = Films[i]->head;
-      mark* nextMark = NULL;
-
-      if (currentMark != NULL) {
-        nextMark = currentMark->sameFilm;
-        free(currentMark);
-        currentMark = NULL;
-      }
-
-      while (nextMark != NULL) {
-        currentMark = nextMark;
-        free(currentMark);
-        nextMark = nextMark->sameFilm;
-      }
-      free(Films[i]);
-      Films[i] = NULL;
-      
-    }
-
-  }
-  
-  for (int i = 0; i < NB_USERS; i++) {
-    
-    if (Users[i] != NULL) {
-
-      free(Users[i]);
-      Users[i] = NULL;
-
-    }
-
-  }
-
-}
-
-/* MAIN */
-
-int main(int argc, char* argv[]) {
-  
-  initializeFilms();
-  initializeUsers();
-  readData("testFile.txt");
-  // displayFilms();
-  // displayUsers();
-  freeMemory();
-
-  return 0;
 
 }

@@ -5,7 +5,7 @@
 #include "lib.h"
 
 /*
- * FUNCTIONS
+ * THROW ERROR
  */
 
 /**
@@ -13,9 +13,15 @@
  * @param msg
  */
 void throwError(char msg[T_MAX]) {
-  printf("[Daufilm] Error: %s", msg);
+  
+  printf("[Daufilm] Error: %s\n", msg);
   exit(0);
+
 }
+
+/*
+ * INITIALIZATION
+ */
 
 /**
  * TODO
@@ -55,6 +61,10 @@ list* initializeList() {
   return new_list;
 
 }
+
+/*
+ * CHAINE LIST FUNCTIONS
+ */
 
 /**
  * TODO
@@ -112,6 +122,10 @@ list* addList(list* l, mark* m) {
 
 }
 
+/*
+ * DISPLAY FUNCTIONS
+ */
+
 /**
  * TODO
  */
@@ -156,8 +170,84 @@ void displayUsers() {
 
   }
 
+}
+
+/**
+ * TODO
+ * @param m
+ */
 void displayMark(mark* m) {
 
   printf("Value=%d;\tidFilm=%d;\tidUser=%d\n", m->markValue, m->idFilm, m->idUser);
+
+}
+
+/*
+ * FREE MEMORY FUNCTION
+ */
+
+/**
+ * free all memory allocations
+ */
+void freeMemory() {
+
+  /*
+   * variables
+   */
+
+  mark* currentMark = NULL;
+  mark* nextMark = NULL;
+
+  /*
+   * free the marks
+   */
+
+  for (int i = 0; i < NB_FILMS; i++) {
+    
+    if (Films[i] != NULL) {
+
+      currentMark = Films[i]->head;
+
+      while (currentMark != NULL) {
+
+        nextMark = currentMark->sameFilm;
+        free(currentMark);
+        currentMark = nextMark;
+
+      }
+      
+    }
+
+  }
+
+  /*
+   * free the Films lists
+   */
+
+  for (int i = 0; i < NB_FILMS; i++) {
+    
+    if (Films[i] != NULL) {
+
+      free(Films[i]);
+      Films[i] = NULL;
+      
+    }
+
+  }
+
+  /*
+   * free the Users lists
+   */
+  
+  for (int i = 0; i < NB_USERS; i++) {
+    
+    if (Users[i] != NULL) {
+
+      free(Users[i]);
+      Users[i] = NULL;
+
+    }
+
+  }
 
 }
