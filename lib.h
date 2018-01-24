@@ -11,12 +11,16 @@
 #include <math.h>
 
 /*
- * TODO
+ * DEFINES
  */
 
 #define T_MAX 512
 #define NB_FILMS 10 /*17770*/
 #define NB_USERS 100 /*2649429*/
+
+/*
+ * TYPE DEF
+ */
 
 typedef struct mark {
   int markValue;
@@ -29,6 +33,10 @@ typedef struct mark {
 typedef struct list {
   mark* head;
 } list ;
+
+/*
+ * VARIABLES
+ */
 
 list* Films[NB_FILMS];
 list* Users[NB_USERS];
@@ -51,6 +59,8 @@ void displayMark(mark* m);
 /* extractData.c */
 
 void readData(char filename[T_MAX]);
+void initializeUsers();
+void initializeFilms();
 
 /*
  * END
