@@ -122,6 +122,39 @@ list* addList(list* l, mark* m) {
 
 }
 
+/**
+ * TODO
+ * @param haystack
+ * @param needle
+ * @return
+ */
+int inList(list* haystack, int needle) {
+
+  /*
+   * variables
+   */
+
+  mark* currentMark = NULL;
+
+  /*
+   * find needle in a haystack
+   */
+
+  currentMark = haystack->head;
+
+  while (currentMark != NULL) {
+    if (currentMark->idFilm == needle) return 1;
+    currentMark = currentMark->sameUser;
+  }
+
+  /*
+   * return 0 if not found
+   */
+
+  return 0;
+
+}
+
 /*
  * DISPLAY FUNCTIONS
  */
@@ -188,6 +221,7 @@ void displayMark(mark* m) {
 
 /**
  * free all memory allocations
+ * @galere compter les frees/allocs (printf, &line)
  */
 void freeMemory() {
 

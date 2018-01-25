@@ -52,6 +52,7 @@ mark* initializeMark(int markValue, int idFilm, int idUser);
 list* initializeList();
 mark* findSimilarity(mark* m1, mark* m2);
 list* addList(list* l, mark* m);
+int inList(list* haystack, int needle);
 void displayFilms();
 void displayUsers();
 void displayMark(mark* m);
@@ -61,6 +62,16 @@ void displayMark(mark* m);
 void readData(char filename[T_MAX]);
 void initializeUsers();
 void initializeFilms();
+
+/* knn-algorithms.c */
+
+float centeredDotProduct(int* x, int* y);
+float centeredNorm(int* x);
+float mean(int* x);
+float pearsonSimilarity(int* x, int* y);
+float pearsonSimilarityBetweenUsers(int user1, int user2);
+int hasAtLeastOneFilmInCommon(int user1, int user2);
+void kNearestNeighboors(int user, int k, int* nearestNeighboors);
 
 /*
  * END
