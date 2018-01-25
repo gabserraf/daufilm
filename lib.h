@@ -47,15 +47,18 @@ list* Users[NB_USERS];
 
 /* auxiliaries.c */
 
-void throwError(char msg[T_MAX]);
 mark* initializeMark(int markValue, int idFilm, int idUser);
 list* initializeList();
 mark* findSimilarity(mark* m1, mark* m2);
 list* addList(list* l, mark* m);
 int inList(list* haystack, int needle);
+int len(list* l);
 void displayFilms();
 void displayUsers();
 void displayMark(mark* m);
+void throwError(char msg[T_MAX]);
+int argmin(double l[], int size);
+void freeMemory();
 
 /* extractData.c */
 
@@ -65,13 +68,13 @@ void initializeFilms();
 
 /* knn-algorithms.c */
 
-float centeredDotProduct(int* x, int* y);
-float centeredNorm(int* x);
-float mean(int* x);
-float pearsonSimilarity(int* x, int* y);
-float pearsonSimilarityBetweenUsers(int user1, int user2);
-int hasAtLeastOneFilmInCommon(int user1, int user2);
-void kNearestNeighboors(int user, int k, int* nearestNeighboors);
+double centeredDotProduct(int* x, int* y);
+double centeredNorm(int* x);
+double mean(int* x);
+double pearsonSimilarity(int* x, int* y);
+double pearsonSimilarityBetweenUsers(int user1, int user2);
+int numberOfFilmsInCommon(int user1, int user2);
+int* kNearestNeighboors(int user, int k);
 
 /*
  * END

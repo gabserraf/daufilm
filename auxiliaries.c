@@ -5,21 +5,6 @@
 #include "lib.h"
 
 /*
- * THROW ERROR
- */
-
-/**
- * TODO
- * @param msg
- */
-void throwError(char msg[T_MAX]) {
-  
-  printf("[Daufilm] Error: %s\n", msg);
-  exit(0);
-
-}
-
-/*
  * INITIALIZATION
  */
 
@@ -155,6 +140,39 @@ int inList(list* haystack, int needle) {
 
 }
 
+/**
+ * computes and return the size of a chained list
+ * @param l, the list
+ * @return the size of a chained list
+ */
+int len(list* l) {
+
+  /*
+   * variables
+   */
+
+  mark* currentMark = NULL;
+  int size = 0;
+
+  /*
+   * compute size
+   */
+
+  currentMark = l->head;
+
+  while (currentMark != NULL) {
+    size++;
+    currentMark = currentMark->sameUser;
+  }
+
+  /*
+   * end & return
+   */
+
+  return size;
+
+}
+
 /*
  * DISPLAY FUNCTIONS
  */
@@ -216,8 +234,36 @@ void displayMark(mark* m) {
 }
 
 /*
- * FREE MEMORY FUNCTION
+ * OTHER
  */
+
+/**
+ * TODO
+ * @param msg
+ */
+void throwError(char msg[T_MAX]) {
+  
+  printf("[Daufilm] Error: %s\n", msg);
+  exit(0);
+
+}
+
+/**
+ * TODO
+ * @param l
+ * @return
+ */
+int argmin(double l[], int size) {
+
+  int index = 0;
+
+  for (int i = 0; i < size; i++) {
+    if (l[i] <= l[index]) index = i;
+  }
+
+  return index;
+
+}
 
 /**
  * free all memory allocations

@@ -15,22 +15,20 @@
  * @return
  * @galere changer mean par 3 si jamais
  */
-float centeredDotProduct(int* x, int* y) {
+double centeredDotProduct(int* x, int* y) {
 
   /*
    * variables
    */
 
   int size = sizeof(x)/sizeof(int);
-  float result = 0;
-  float mean_x = mean(x);
-  float mean_y = mean(y);
+  double result = 0;
 
   /*
    * compute the dot product
    */
 
-  for (int i = 0; i < size; i++) result += (x[i] - mean_x) * (y[i] - mean_y);
+  for (int i = 0; i < size; i++) result += 1.0 * (x[i] - 3) * (y[i] - 3);
 
   /*
    * end & return
@@ -40,50 +38,21 @@ float centeredDotProduct(int* x, int* y) {
 
 }
 
-/**
+/*.0*
  * TODO
  * @param x
  * @return
  */
-float centeredNorm(int* x) {
-  return sqrt(centeredDotProduct(x, x));
-}
-
-/**
- * TODO
- * @param x
- * @return
- */
-float mean(int* x) {
-
-  /*
-   * variables
-   */
-
-  int size = sizeof(x)/sizeof(int);
-  float result = 0;
-
-  /*
-   * compute mean
-   */
-
-  for (int i = 0; i < size; i++) result += x[i];
-  result /= size;
-
-  /*
-   * end & result
-   */
-
-  return result;
-
+double centeredNorm(int* x) {
+  return sqrt(1.0 * centeredDotProduct(x, x));
 }
 
 /**
  * TODO
  * @galere remplacer 3 par mean
  */
-float pearsonSimilarity(int* x, int* y) {
-  return centeredDotProduct(x, y) / (centeredNorm(x) * centeredNorm(y));
+double pearsonSimilarity(int* x, int* y) {
+  return 1.0 * centeredDotProduct(x, y) / (centeredNorm(x) * centeredNorm(y));
 }
 
 /**
@@ -91,7 +60,7 @@ float pearsonSimilarity(int* x, int* y) {
  * @param user1
  * @param user2
  */
-float pearsonSimilarityBetweenUsers(int user1, int user2) {
+double pearsonSimilarityBetweenUsers(int user1, int user2) {
 
   /*
    * variables
@@ -101,8 +70,10 @@ float pearsonSimilarityBetweenUsers(int user1, int user2) {
   mark* currentMark2 = NULL;
   list* listUser1 = Users[user1-1];
   list* listUser2 = Users[user2-1];
-  int* rxi = NULL;
-  int* ryi = NULL;
+  int n = numberOfFilmsInCommon(user1, user2);
+  int counter = 0;
+  int rxi[n];
+  int ryi[n];
 
   /*
    * find common films & save mark values
@@ -110,7 +81,7 @@ float pearsonSimilarityBetweenUsers(int user1, int user2) {
 
   currentMark1 = listUser1->head;
 
-  while (currentMark != NULL) {
+  while (currentMark1 != NULL) {
 
     currentMark2 = listUser2->head;
 
@@ -118,11 +89,9 @@ float pearsonSimilarityBetweenUsers(int user1, int user2) {
 
       if (currentMark1->idFilm == currentMark2->idFilm) {
 
-        *rxi = currentMark1->markValue;
-        *ryi = currentMark1->markValue;
-
-        rxi++;
-        ryi++;
+        rxi[counter] = currentMark1->markValue;
+        ryi[counter] = currentMark2->markValue;
+        counter++;
 
       }
 
@@ -148,7 +117,7 @@ float pearsonSimilarityBetweenUsers(int user1, int user2) {
  * @param user2
  * @return
  */
-int hasAtLeastOneFilmInCommon(int user1, int user2) {
+int numberOfFilmsInCommon(int user1, int user2) {
 
   /*
    * variables
@@ -157,25 +126,28 @@ int hasAtLeastOneFilmInCommon(int user1, int user2) {
   mark* currentMark = NULL;
   list* listUser1 = Users[user1-1];
   list* listUser2 = Users[user2-1];
+  int result = 0;
+
+  if (listUser1 == NULL || listUser2 == NULL) return 0;
 
   /*
-   * find at least a film in common
+   * find the number of films in common
    */
 
   currentMark = listUser1->head;
 
   while (currentMark != NULL) {
     
-    if (inList(listUser2, currentMark->idFilm)) return 1;
+    if (inList(listUser2, currentMark->idFilm)) result++;
     currentMark = currentMark->sameUser;
 
   }
 
   /*
-   * return 0 if there is no film in common
+   * return
    */
 
-  return 0;
+  return result;
 
 }
 
@@ -185,45 +157,42 @@ int hasAtLeastOneFilmInCommon(int user1, int user2) {
  * @param k
  * @param nearestNeighboors
  */
-void kNearestNeighboors(int user, int k, int* nearestNeighboors) {
+int* kNearestNeighboors(int user, int k) {
 
   /*
    * variables
    */
 
-  float bestValues[k];
-  int bestUsers[k];
-  float pearsonSimilarityValue = 0;
+  int* bestUsers = malloc(sizeof(int) * k);
+  double bestValues[k];
+  double pearsonSimilarityValue = 0.0;
+  int minIndex = 0;
+  int counter = 0;
 
   /*
-   * initialze best values
+   * initialization
    */
 
-  for (int i = 0; i < k; i++) bestValues[i] = -1;
+  for (int i = 0; i < k; i++) bestValues[i] = -2.0;
 
   /*
-   * finding k nearest neighboors
+   * get all users and all pearson values
    */
 
   for (int u = 1; u <= NB_USERS; u++) {
 
-    if (hasAtLeastOneFilmInCommon(user, u) && user != u) {
+    if (numberOfFilmsInCommon(user, u) != 0 && user != u) {
+
+      counter++;
 
       pearsonSimilarityValue = pearsonSimilarityBetweenUsers(user, u);
+      
+      minIndex = argmin(bestValues, k);
 
-      for (int i = 0; i < k; i++) {
+      if (pearsonSimilarityValue >= bestValues[minIndex]) {
 
-        if (pearsonSimilarityValue > bestValues[i]) {
-
-          for (int j = k-1; j = i+1; j--) {
-            bestValues[j] = bestValues[j-1];
-            bestUsers[j] = bestUsers[j-1];
-          }
-
-          bestValues[i] = pearsonSimilarityValue;
-          bestUsers[i] = u;
-
-        }
+        bestValues[minIndex] = pearsonSimilarityValue;
+        bestUsers[minIndex] = u;
 
       }
 
@@ -232,15 +201,39 @@ void kNearestNeighboors(int user, int k, int* nearestNeighboors) {
   }
 
   /*
-   * end
+   * detect error
    */
 
-  nearestNeighboors = bestUsers;
+  if (counter < k) {
+    throwError("Number of neighboors higher than it can be");
+  }
+
+  /*
+   * end & return
+   */
+
+  return bestUsers;
 
 }
 
 /* MAIN */
 
 int main(int argc, char* argv[]) {
+
+  initializeUsers();
+  initializeFilms();
+
+  for (int i = 1; i < argc; i++) readData(argv[i]);
+
+  int* nearestNeighboors = kNearestNeighboors(7, 7);
+
+  for (int i = 0; i < 7; i++) {
+    printf("%d\n", nearestNeighboors[i]);
+  }
+
+  free(nearestNeighboors);
+  freeMemory();
+
   return 0;
+
 }
