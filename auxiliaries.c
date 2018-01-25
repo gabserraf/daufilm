@@ -173,6 +173,27 @@ int len(list* l) {
 
 }
 
+/**
+ * TODO
+ * @param user
+ * @param film
+ * @return
+ */
+int searchMark(int user, int film) {
+
+  mark* currentMark = Users[user-1]->head;
+
+  while (currentMark != NULL) {
+    
+    if (currentMark->idFilm == film) return currentMark->markValue;
+    currentMark = currentMark->sameUser;
+    
+  }
+
+  return 0;
+
+}
+
 /*
  * DISPLAY FUNCTIONS
  */

@@ -101,3 +101,20 @@ void readData(char filename[T_MAX]) {
   fclose(file);
 
 }
+
+/* MAIN */
+
+/*
+int main(int argc, char* argv[]) {
+
+  initializeUsers();
+  initializeFilms();
+
+  for (int i = 1; i < argc; i++) readData(argv[i]);
+
+  freeMemory();
+
+  return 0;
+
+}
+*/

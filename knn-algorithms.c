@@ -167,7 +167,7 @@ int* kNearestNeighboors(int user, int k) {
   double bestValues[k];
   double pearsonSimilarityValue = 0.0;
   int minIndex = 0;
-  int counter = 0;
+  int counter = 0; 
 
   /*
    * initialization
@@ -209,6 +209,41 @@ int* kNearestNeighboors(int user, int k) {
   }
 
   /*
+   * sort neighboors (using bubble sort)
+   */
+
+  double tmpValue = 0.0;
+  int tmpUser = 0;
+  int size = k;
+  int sorted = 0;
+
+  while (!sorted) {
+
+    sorted = 1;
+
+    for (int i = 0; i < size-1; i++) {
+
+      if (bestValues[i] < bestValues[i+1]) {
+        
+        tmpValue = bestValues[i];
+        bestValues[i] = bestValues[i+1];
+        bestValues[i+1] = tmpValue;
+
+        tmpUser = bestUsers[i];
+        bestUsers[i] = bestUsers[i+1];
+        bestUsers[i+1] = tmpUser;
+
+        sorted = 0;
+
+      }
+
+    }
+
+    size--;
+
+  }
+
+  /*
    * end & return
    */
 
@@ -218,6 +253,7 @@ int* kNearestNeighboors(int user, int k) {
 
 /* MAIN */
 
+/*
 int main(int argc, char* argv[]) {
 
   initializeUsers();
@@ -237,3 +273,4 @@ int main(int argc, char* argv[]) {
   return 0;
 
 }
+*/

@@ -53,6 +53,7 @@ mark* findSimilarity(mark* m1, mark* m2);
 list* addList(list* l, mark* m);
 int inList(list* haystack, int needle);
 int len(list* l);
+int searchMark(int user, int film);
 void displayFilms();
 void displayUsers();
 void displayMark(mark* m);
@@ -70,11 +71,14 @@ void initializeFilms();
 
 double centeredDotProduct(int* x, int* y);
 double centeredNorm(int* x);
-double mean(int* x);
 double pearsonSimilarity(int* x, int* y);
 double pearsonSimilarityBetweenUsers(int user1, int user2);
 int numberOfFilmsInCommon(int user1, int user2);
 int* kNearestNeighboors(int user, int k);
+
+/* pgmView.c */
+
+void createPGM(int user, int k);
 
 /*
  * END
