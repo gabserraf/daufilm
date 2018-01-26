@@ -42,8 +42,8 @@ void readData(char filename[T_MAX]) {
 
   FILE* file = NULL;
   char* line = NULL;
-  size_t len = 0;
-  ssize_t read = 0;
+  // size_t len = 0;
+  // ssize_t read = 0;
   char* token = NULL;
 
   int idFilm = 0;
@@ -61,8 +61,8 @@ void readData(char filename[T_MAX]) {
 
   if (file == NULL) throwError("File doesn't exist");
 
-  while ((read = getline(&line, &len, file)) != -1) {
-    
+  while (fgets(line, 17, file) != NULL) {
+    /*
     if (strstr(line, ":")) {
 
       if (idFilm != 0) Films[idFilm-1] = filmList;
@@ -90,21 +90,19 @@ void readData(char filename[T_MAX]) {
     }
 
     Films[idFilm-1] = filmList;
-
+    */
   }
 
   /*
    * end & return
    */
 
-  free(line);
   fclose(file);
 
 }
 
 /* MAIN */
 
-/*
 int main(int argc, char* argv[]) {
 
   initializeUsers();
@@ -112,9 +110,8 @@ int main(int argc, char* argv[]) {
 
   for (int i = 1; i < argc; i++) readData(argv[i]);
 
-  freeMemory();
+  // freeMemory();
 
   return 0;
 
 }
-*/

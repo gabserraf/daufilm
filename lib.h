@@ -15,8 +15,8 @@
  */
 
 #define T_MAX 512
-#define NB_FILMS 10 /*17770*/
-#define NB_USERS 100 /*2649429*/
+#define NB_FILMS 17770
+#define NB_USERS 2649429
 
 /*
  * TYPE DEF
