@@ -2,7 +2,7 @@
  * INCLUDES
  */
 
-#include "lib.h"
+#include "../lib.h"
 
 /*
  * FUNCTIONS
@@ -13,7 +13,6 @@
  * @param x
  * @param y
  * @return
- * @galere changer mean par 3 si jamais
  */
 double centeredDotProduct(int* x, int* y) {
 
@@ -79,11 +78,11 @@ double pearsonSimilarityBetweenUsers(int user1, int user2) {
    * find common films & save mark values
    */
 
-  currentMark1 = listUser1->head;
+  currentMark1 = listUser1 != NULL ? listUser1->head : NULL;
 
   while (currentMark1 != NULL) {
 
-    currentMark2 = listUser2->head;
+    currentMark2 = listUser2 != NULL ? listUser2->head : NULL;
 
     while (currentMark2 != NULL) {
 
@@ -128,13 +127,11 @@ int numberOfFilmsInCommon(int user1, int user2) {
   list* listUser2 = Users[user2-1];
   int result = 0;
 
-  if (listUser1 == NULL || listUser2 == NULL) return 0;
-
   /*
    * find the number of films in common
    */
 
-  currentMark = listUser1->head;
+  currentMark = listUser1 != NULL ? listUser1->head : NULL;
 
   while (currentMark != NULL) {
     
@@ -154,8 +151,64 @@ int numberOfFilmsInCommon(int user1, int user2) {
 /**
  * TODO
  * @param user
+ * @return
+ * @galere sizeof
+ */
+int* findNeighboors(int user) {
+
+  /*
+   * variables
+   */
+
+  int* neighboors = malloc(sizeof(int) * NB_USERS); // (max number of neighboors (NB_USERS-1) + array size (1))
+  list* filmsRatedbyUser = NULL;
+  list* usersWhoRatedFilm = NULL;
+  mark* currentMarkUser = NULL;
+  mark* currentMarkFilm = NULL;
+
+  /*
+   * find neighboors
+   */
+
+  neighboors[0] = 0;
+  filmsRatedbyUser = Users[user-1];
+
+  currentMarkUser = filmsRatedbyUser != NULL ? filmsRatedbyUser->head : NULL;
+
+  while (currentMarkUser != NULL) {
+
+    usersWhoRatedFilm = Films[currentMarkUser->idFilm-1];
+    currentMarkFilm = usersWhoRatedFilm != NULL ? usersWhoRatedFilm->head : NULL;
+
+    while (currentMarkFilm != NULL) {
+      
+      if (!inArray(neighboors, currentMarkFilm->idUser, neighboors[0]) && currentMarkFilm->idUser != user) {
+        neighboors[0]++;
+        neighboors[neighboors[0]] = currentMarkFilm->idUser;
+      }
+
+      currentMarkFilm = currentMarkFilm->sameFilm;
+
+    }
+
+    currentMarkUser = currentMarkUser->sameUser;
+
+  }
+
+  /*
+   * end & return
+   */
+
+  return neighboors;
+
+}
+
+/**
+ * TODO
+ * @param user
  * @param k
  * @param nearestNeighboors
+ * @galere sizeof
  */
 int* kNearestNeighboors(int user, int k) {
 
@@ -167,7 +220,7 @@ int* kNearestNeighboors(int user, int k) {
   double bestValues[k];
   double pearsonSimilarityValue = 0.0;
   int minIndex = 0;
-  int counter = 0; 
+  int* neighboors = NULL;
 
   /*
    * initialization
@@ -176,25 +229,25 @@ int* kNearestNeighboors(int user, int k) {
   for (int i = 0; i < k; i++) bestValues[i] = -2.0;
 
   /*
-   * get all users and all pearson values
+   * get all neighboors
    */
 
-  for (int u = 1; u <= NB_USERS; u++) {
+  neighboors = findNeighboors(user);
 
-    if (numberOfFilmsInCommon(user, u) != 0 && user != u) {
+  /*
+   * get all neighboors and all pearson values
+   */
 
-      counter++;
+  for (int i = 1; i < neighboors[0]; i++) {
 
-      pearsonSimilarityValue = pearsonSimilarityBetweenUsers(user, u);
-      
-      minIndex = argmin(bestValues, k);
+    pearsonSimilarityValue = pearsonSimilarityBetweenUsers(user, neighboors[i]);
+    
+    minIndex = argmin(bestValues, k);
 
-      if (pearsonSimilarityValue >= bestValues[minIndex]) {
+    if (pearsonSimilarityValue >= bestValues[minIndex]) {
 
-        bestValues[minIndex] = pearsonSimilarityValue;
-        bestUsers[minIndex] = u;
-
-      }
+      bestValues[minIndex] = pearsonSimilarityValue;
+      bestUsers[minIndex] = neighboors[i];
 
     }
 
@@ -203,74 +256,24 @@ int* kNearestNeighboors(int user, int k) {
   /*
    * detect error
    */
-
-  if (counter < k) {
+  
+  if (neighboors[0] < k) {
+    free(neighboors);
+    free(bestUsers);
     throwError("Number of neighboors higher than it can be");
   }
 
   /*
-   * sort neighboors (using bubble sort)
+   * sort neighboors
    */
 
-  double tmpValue = 0.0;
-  int tmpUser = 0;
-  int size = k;
-  int sorted = 0;
-
-  while (!sorted) {
-
-    sorted = 1;
-
-    for (int i = 0; i < size-1; i++) {
-
-      if (bestValues[i] < bestValues[i+1]) {
-        
-        tmpValue = bestValues[i];
-        bestValues[i] = bestValues[i+1];
-        bestValues[i+1] = tmpValue;
-
-        tmpUser = bestUsers[i];
-        bestUsers[i] = bestUsers[i+1];
-        bestUsers[i+1] = tmpUser;
-
-        sorted = 0;
-
-      }
-
-    }
-
-    size--;
-
-  }
+  bubbleSort(bestValues, bestUsers, k);
 
   /*
    * end & return
    */
 
+  free(neighboors);
   return bestUsers;
 
 }
-
-/* MAIN */
-
-/*
-int main(int argc, char* argv[]) {
-
-  initializeUsers();
-  initializeFilms();
-
-  for (int i = 1; i < argc; i++) readData(argv[i]);
-
-  int* nearestNeighboors = kNearestNeighboors(7, 7);
-
-  for (int i = 0; i < 7; i++) {
-    printf("%d\n", nearestNeighboors[i]);
-  }
-
-  free(nearestNeighboors);
-  freeMemory();
-
-  return 0;
-
-}
-*/

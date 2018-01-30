@@ -9,14 +9,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
+#include <time.h>
 
 /*
  * DEFINES
  */
 
-#define T_MAX 512
-#define NB_FILMS 17770
-#define NB_USERS 2649429
+#define T_MAX 128
+#define NB_FILMS 100 // 17770
+#define NB_USERS 1000 // 2649429
 
 /*
  * TYPE DEF
@@ -51,21 +53,27 @@ mark* initializeMark(int markValue, int idFilm, int idUser);
 list* initializeList();
 mark* findSimilarity(mark* m1, mark* m2);
 list* addList(list* l, mark* m);
-int inList(list* haystack, int needle);
-int len(list* l);
+int lenForUser(list* l);
+int lenForFilm(list* l);
 int searchMark(int user, int film);
+int inList(list* haystack, int needle);
+int inArray(int* haystack, int needle, int size);
+void bubbleSort(double* values, int* objects, int size);
+int argmin(double l[], int size);
 void displayFilms();
 void displayUsers();
 void displayMark(mark* m);
 void throwError(char msg[T_MAX]);
-int argmin(double l[], int size);
+int isNumber(char* chr);
+int getNumberMarks();
 void freeMemory();
 
 /* extractData.c */
 
-void readData(char filename[T_MAX]);
 void initializeUsers();
 void initializeFilms();
+void readData(char filename[T_MAX]);
+void createDataFile();
 
 /* knn-algorithms.c */
 
@@ -74,11 +82,19 @@ double centeredNorm(int* x);
 double pearsonSimilarity(int* x, int* y);
 double pearsonSimilarityBetweenUsers(int user1, int user2);
 int numberOfFilmsInCommon(int user1, int user2);
+int* findNeighboors(int user);
 int* kNearestNeighboors(int user, int k);
 
 /* pgmView.c */
 
 void createPGM(int user, int k);
+
+/* recommandation.c */
+
+int estimatedMark(int film, int user, int k);
+int reco1(int film, int user);
+void reco2(int user);
+void reco3(int X);
 
 /*
  * END

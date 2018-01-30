@@ -2,7 +2,7 @@
  * INCLUDES
  */
 
-#include "lib.h"
+#include "../lib.h"
 
 /*
  * FUNCTIONS
@@ -20,12 +20,14 @@ void createPGM(int user, int k) {
    */
 
   FILE* pgmFile = NULL;
+  char line[T_MAX] = "";
+  char append[T_MAX] = "";
+  
   int* neighboors = NULL;
   int films[NB_FILMS];
   mark* currentMark = NULL;
-  char line[T_MAX] = "";
-  char append[T_MAX] = "";
-  double pxValue = 0;
+
+  int pxValue = 0;
   int nbFilms = 0;
 
   /*
@@ -42,12 +44,15 @@ void createPGM(int user, int k) {
 
   for (int i = 0; i < k; i++) {
     
-    currentMark = Users[neighboors[i]-1]->head;
+    currentMark = Users[neighboors[i]-1] != NULL ? Users[neighboors[i]-1]->head : NULL;
 
     while (currentMark != NULL) {
+      
       if (!films[currentMark->idFilm-1]) nbFilms++;
+      
       films[currentMark->idFilm-1] = 1;
       currentMark = currentMark->sameUser;
+
     }
 
   }
@@ -56,9 +61,13 @@ void createPGM(int user, int k) {
    * create PGM
    */
 
-  pgmFile = fopen("pgmView.pgm", "w");
+  pgmFile = fopen("Q3/pgmView.pgm", "w");
 
-  strcpy(line, "P2\r\n");
+  /*
+   * head of PGM
+   */
+
+  strcpy(line, "P2\n");
   fputs(line, pgmFile);
 
   strcpy(line, "");
@@ -67,30 +76,38 @@ void createPGM(int user, int k) {
   strcat(line, " ");
   sprintf(append, "%d", k);
   strcat(line, append);
-  strcat(line, " \n\r");
+  strcat(line, " \n");
   fputs(line, pgmFile);
 
-  for (int i = 0; i < k; i++) {
+  strcpy(line, "255\n");
+  fputs(line, pgmFile);
 
-    strcpy(line, "");
+  /*
+   * PGM content
+   */
+
+  for (int i = 0; i < k; i++) {
 
     for (int j = 0; j < NB_FILMS; j++) {
 
       if (films[j]) {
 
-        pxValue = 1.0 - 1.0*searchMark(neighboors[i], j+1) / 5;        
+        strcpy(line, "");
+        strcpy(append, "");
 
-        sprintf(append, "%f", pxValue);
+        pxValue = (int) 255.0 * (5.0 - 1.0*searchMark(neighboors[i], j+1)) / 5.0;
+
+        sprintf(append, "%d", pxValue);
         strcat(line, append);
         strcat(line, " ");
+
+        fputs(line, pgmFile);
 
       }
 
     }
 
-    strcat(line, "\n\r");
-
-    fputs(line, pgmFile);
+    fputs("\n", pgmFile);
 
   }
 
@@ -100,22 +117,5 @@ void createPGM(int user, int k) {
 
   free(neighboors);
   fclose(pgmFile);
-
-}
-
-/* MAIN */
-
-int main(int argc, char* argv[]) {
-
-  initializeUsers();
-  initializeFilms();
-
-  for (int i = 1; i < argc; i++) readData(argv[i]);
-
-  createPGM(7, 7);
-
-  freeMemory();
-
-  return 0;
 
 }

@@ -2,7 +2,7 @@
  * INCLUDES
  */
 
-#include "lib.h"
+#include "../lib.h"
 
 /*
  * FUNCTIONS
@@ -41,9 +41,7 @@ void readData(char filename[T_MAX]) {
    */
 
   FILE* file = NULL;
-  char* line = NULL;
-  // size_t len = 0;
-  // ssize_t read = 0;
+  char line[T_MAX] = "";
   char* token = NULL;
 
   int idFilm = 0;
@@ -59,10 +57,13 @@ void readData(char filename[T_MAX]) {
   
   file = fopen(filename, "r");
 
-  if (file == NULL) throwError("File doesn't exist");
+  if (file == NULL) {
+    printf("[Daufilm] Error: File doesn't exist\n");
+    exit(0);
+  }
 
-  while (fgets(line, 17, file) != NULL) {
-    /*
+  while (fgets(line, T_MAX, file) != NULL) {
+
     if (strstr(line, ":")) {
 
       if (idFilm != 0) Films[idFilm-1] = filmList;
@@ -90,7 +91,7 @@ void readData(char filename[T_MAX]) {
     }
 
     Films[idFilm-1] = filmList;
-    */
+    
   }
 
   /*
@@ -101,17 +102,65 @@ void readData(char filename[T_MAX]) {
 
 }
 
-/* MAIN */
+/**
+ * TODO
+ */
+void createDataFile() {
 
-int main(int argc, char* argv[]) {
+  /*
+   * variables
+   */
 
-  initializeUsers();
-  initializeFilms();
+  FILE* file = NULL;
+  char line[T_MAX] = "";
+  char append[T_MAX] = "";
+  mark* currentMark = NULL;
 
-  for (int i = 1; i < argc; i++) readData(argv[i]);
+  /*
+   * open file
+   */
 
-  // freeMemory();
+  file = fopen("data.txt", "w");
 
-  return 0;
+  /*
+   * output
+   */
+
+  for (int i = 0; i < NB_FILMS; i++) {
+
+    strcpy(line, "");
+
+    sprintf(append, "%d", (i+1));
+    strcat(line, append);
+    strcat(line, ":\n");
+    fputs(line, file);
+
+    currentMark = Films[i] != NULL ? Films[i]->head : NULL;
+
+    while (currentMark != NULL) {
+
+      strcpy(line, "");
+
+      sprintf(append, "%d", currentMark->idUser);
+      strcat(line, append);
+      strcat(line, ",");
+
+      sprintf(append, "%d", currentMark->markValue);
+      strcat(line, append);
+      strcat(line, ",\n");
+
+      currentMark = currentMark->sameFilm;
+
+      fputs(line, file);
+
+    }
+
+  }
+
+  /*
+   * end
+   */
+
+  fclose(file);
 
 }

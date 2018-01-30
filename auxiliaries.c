@@ -81,7 +81,7 @@ mark* findSimilarity(mark* m1, mark* m2) {
  */
 list* addList(list* l, mark* m) {
 
-  mark* head = l->head;
+  mark* head = l != NULL ? l->head : NULL;
 
   if (head == NULL) {
 
@@ -125,7 +125,7 @@ int inList(list* haystack, int needle) {
    * find needle in a haystack
    */
 
-  currentMark = haystack->head;
+  currentMark = haystack != NULL ? haystack->head : NULL;
 
   while (currentMark != NULL) {
     if (currentMark->idFilm == needle) return 1;
@@ -145,7 +145,7 @@ int inList(list* haystack, int needle) {
  * @param l, the list
  * @return the size of a chained list
  */
-int len(list* l) {
+int lenForUser(list* l) {
 
   /*
    * variables
@@ -158,11 +158,44 @@ int len(list* l) {
    * compute size
    */
 
-  currentMark = l->head;
+  currentMark = l != NULL ? l->head : NULL;
 
   while (currentMark != NULL) {
     size++;
     currentMark = currentMark->sameUser;
+  }
+
+  /*
+   * end & return
+   */
+
+  return size;
+
+}
+
+/**
+ * computes and return the size of a chained list
+ * @param l, the list
+ * @return the size of a chained list
+ */
+int lenForFilm(list* l) {
+
+  /*
+   * variables
+   */
+
+  mark* currentMark = NULL;
+  int size = 0;
+
+  /*
+   * compute size
+   */
+
+  currentMark = l != NULL ? l->head : NULL;
+
+  while (currentMark != NULL) {
+    size++;
+    currentMark = currentMark->sameFilm;
   }
 
   /*
@@ -181,7 +214,7 @@ int len(list* l) {
  */
 int searchMark(int user, int film) {
 
-  mark* currentMark = Users[user-1]->head;
+  mark* currentMark = Users[user-1] != NULL ? Users[user-1]->head : NULL;
 
   while (currentMark != NULL) {
     
@@ -191,6 +224,90 @@ int searchMark(int user, int film) {
   }
 
   return 0;
+
+}
+
+/*
+ * ARRAY FUNCTIONS
+ */
+
+/**
+ * TODO
+ * @param haystack
+ * @param needle
+ * @return
+ */
+int inArray(int* haystack, int needle, int size) {
+
+  if (haystack == NULL) return 0;
+
+  for (int i = 0; i < size; i++) {
+    if (haystack[i] == needle) return 1;
+  }
+
+  return 0;
+
+}
+
+/**
+ * TODO
+ * @param l
+ * @return
+ */
+int argmin(double l[], int size) {
+
+  int index = 0;
+
+  for (int i = 0; i < size; i++) {
+    if (l[i] <= l[index]) index = i;
+  }
+
+  return index;
+
+}
+
+/**
+ * TODO
+ */
+void bubbleSort(double* values, int* objects, int size) {
+  
+  /*
+   * variables
+   */
+
+  double tmpValue = 0.0;
+  int tmpObject = 0;
+  int sorted = 0;
+
+  /*
+   * sorting algorithm
+   */
+
+  while (!sorted) {
+
+    sorted = 1;
+
+    for (int i = 0; i < size-1; i++) {
+
+      if (values[i] < values[i+1]) {
+        
+        tmpValue = values[i];
+        values[i] = values[i+1];
+        values[i+1] = tmpValue;
+
+        tmpObject = objects[i];
+        objects[i] = objects[i+1];
+        objects[i+1] = tmpObject;
+
+        sorted = 0;
+
+      }
+
+    }
+
+    size--;
+
+  }
 
 }
 
@@ -210,11 +327,14 @@ void displayFilms() {
     printf("idFilm = %d\n", i+1);
 
     if (Films[i] != NULL) {
+
       mark* m = Films[i]->head;
+      
       while (m != NULL) {
         printf("Note=%d;\tidUser=%d\n", m->markValue, m->idUser);
         m = m->sameFilm;
       }
+
     }
 
   }
@@ -233,11 +353,14 @@ void displayUsers() {
     printf("idUser = %d\n", i+1);
 
     if (Users[i] != NULL) {
+      
       mark* m = Users[i]->head;
+      
       while (m != NULL) {
         printf("Note=%d;\tidFilm=%d\n", m->markValue, m->idFilm);
         m = m->sameUser;
       }
+
     }
 
   }
@@ -250,7 +373,7 @@ void displayUsers() {
  */
 void displayMark(mark* m) {
 
-  printf("Value=%d;\tidFilm=%d;\tidUser=%d\n", m->markValue, m->idFilm, m->idUser);
+  if (m != NULL) printf("Value=%d;\tidFilm=%d;\tidUser=%d\n", m->markValue, m->idFilm, m->idUser);
 
 }
 
@@ -265,24 +388,59 @@ void displayMark(mark* m) {
 void throwError(char msg[T_MAX]) {
   
   printf("[Daufilm] Error: %s\n", msg);
+  freeMemory();
   exit(0);
 
 }
 
 /**
  * TODO
- * @param l
+ * @param chr
  * @return
  */
-int argmin(double l[], int size) {
+int isNumber(char* chr) {
 
-  int index = 0;
-
-  for (int i = 0; i < size; i++) {
-    if (l[i] <= l[index]) index = i;
+  for (int i = 0; i < strlen(chr); i++) {
+    if (!isdigit(chr[i])) return 0;
   }
 
-  return index;
+  return 1;
+
+}
+
+/**
+ * TODO
+ * @return
+ */
+int getNumberMarks() {
+
+  /*
+   * variables
+   */
+
+  mark* currentMark = NULL;
+  int nbMarks = 0;
+
+  /*
+   * compute nb marks
+   */
+
+  for (int i = 0; i < NB_FILMS; i++) {
+
+    currentMark = Films[i] != NULL ? Films[i]->head : NULL;
+
+    while (currentMark != NULL) {
+      nbMarks++;
+      currentMark = currentMark->sameFilm;
+    }
+
+  }
+
+  /* 
+   * end & return
+   */
+
+  return nbMarks;
 
 }
 
