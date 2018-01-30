@@ -10,56 +10,10 @@
 
 /**
  * TODO
- * @param x
- * @param y
- * @return
- */
-double centeredDotProduct(int* x, int* y) {
-
-  /*
-   * variables
-   */
-
-  int size = sizeof(x)/sizeof(int);
-  double result = 0;
-
-  /*
-   * compute the dot product
-   */
-
-  for (int i = 0; i < size; i++) result += 1.0 * (x[i] - 3) * (y[i] - 3);
-
-  /*
-   * end & return
-   */
-
-  return result;
-
-}
-
-/*.0*
- * TODO
- * @param x
- * @return
- */
-double centeredNorm(int* x) {
-  return sqrt(1.0 * centeredDotProduct(x, x));
-}
-
-/**
- * TODO
- * @galere remplacer 3 par mean
- */
-double pearsonSimilarity(int* x, int* y) {
-  return 1.0 * centeredDotProduct(x, y) / (centeredNorm(x) * centeredNorm(y));
-}
-
-/**
- * TODO
  * @param user1
  * @param user2
  */
-double pearsonSimilarityBetweenUsers(int user1, int user2) {
+double similarityBetweenUsers(int user1, int user2) {
 
   /*
    * variables
@@ -67,32 +21,36 @@ double pearsonSimilarityBetweenUsers(int user1, int user2) {
 
   mark* currentMark1 = NULL;
   mark* currentMark2 = NULL;
+
   list* listUser1 = Users[user1-1];
   list* listUser2 = Users[user2-1];
-  int n = numberOfFilmsInCommon(user1, user2);
-  int counter = 0;
-  int rxi[n];
-  int ryi[n];
+
+  double rx = 0.0;
+  double ry = 0.0;
+  double rxy = 0.0;
 
   /*
    * find common films & save mark values
    */
 
+  /* creates a pointer to brows chaine list 2 */
   currentMark1 = listUser1 != NULL ? listUser1->head : NULL;
 
   while (currentMark1 != NULL) {
 
+    /* update rx value */
+    rx += (currentMark1->markValue - 2.9) * (currentMark1->markValue - 2.9);
+
+    /* creates a pointer to brows chaine list 2 */
     currentMark2 = listUser2 != NULL ? listUser2->head : NULL;
 
     while (currentMark2 != NULL) {
 
-      if (currentMark1->idFilm == currentMark2->idFilm) {
+      /* update rx value */
+      ry += (currentMark2->markValue - 2.9) * (currentMark2->markValue - 2.9);
 
-        rxi[counter] = currentMark1->markValue;
-        ryi[counter] = currentMark2->markValue;
-        counter++;
-
-      }
+      /* update rxy value */
+      if (currentMark1->idFilm == currentMark2->idFilm) rxy += (currentMark1->markValue - 2.9) * (currentMark2->markValue - 2.9);
 
       currentMark2 = currentMark2->sameUser;
 
@@ -106,100 +64,7 @@ double pearsonSimilarityBetweenUsers(int user1, int user2) {
    * compute & return pearson similarity
    */
 
-  return pearsonSimilarity(rxi, ryi);
-
-}
-
-/**
- * TODO
- * @param user1
- * @param user2
- * @return
- */
-int numberOfFilmsInCommon(int user1, int user2) {
-
-  /*
-   * variables
-   */
-
-  mark* currentMark = NULL;
-  list* listUser1 = Users[user1-1];
-  list* listUser2 = Users[user2-1];
-  int result = 0;
-
-  /*
-   * find the number of films in common
-   */
-
-  currentMark = listUser1 != NULL ? listUser1->head : NULL;
-
-  while (currentMark != NULL) {
-    
-    if (inList(listUser2, currentMark->idFilm)) result++;
-    currentMark = currentMark->sameUser;
-
-  }
-
-  /*
-   * return
-   */
-
-  return result;
-
-}
-
-/**
- * TODO
- * @param user
- * @return
- * @galere sizeof
- */
-int* findNeighboors(int user) {
-
-  /*
-   * variables
-   */
-
-  int* neighboors = malloc(sizeof(int) * NB_USERS); // (max number of neighboors (NB_USERS-1) + array size (1))
-  list* filmsRatedbyUser = NULL;
-  list* usersWhoRatedFilm = NULL;
-  mark* currentMarkUser = NULL;
-  mark* currentMarkFilm = NULL;
-
-  /*
-   * find neighboors
-   */
-
-  neighboors[0] = 0;
-  filmsRatedbyUser = Users[user-1];
-
-  currentMarkUser = filmsRatedbyUser != NULL ? filmsRatedbyUser->head : NULL;
-
-  while (currentMarkUser != NULL) {
-
-    usersWhoRatedFilm = Films[currentMarkUser->idFilm-1];
-    currentMarkFilm = usersWhoRatedFilm != NULL ? usersWhoRatedFilm->head : NULL;
-
-    while (currentMarkFilm != NULL) {
-      
-      if (!inArray(neighboors, currentMarkFilm->idUser, neighboors[0]) && currentMarkFilm->idUser != user) {
-        neighboors[0]++;
-        neighboors[neighboors[0]] = currentMarkFilm->idUser;
-      }
-
-      currentMarkFilm = currentMarkFilm->sameFilm;
-
-    }
-
-    currentMarkUser = currentMarkUser->sameUser;
-
-  }
-
-  /*
-   * end & return
-   */
-
-  return neighboors;
+  return rxy / (rx * ry) ;
 
 }
 
@@ -217,10 +82,17 @@ int* kNearestNeighboors(int user, int k) {
    */
 
   int* bestUsers = malloc(sizeof(int) * k);
+  int usersAlreadyDone[NB_USERS];
   double bestValues[k];
-  double pearsonSimilarityValue = 0.0;
+
+  double similarityValue = 0.0;
   int minIndex = 0;
-  int* neighboors = NULL;
+  int nbNeighboors = 0;
+
+  list* filmsRatedbyUser = NULL;
+  list* usersWhoRatedFilm = NULL;
+  mark* currentMarkUser = NULL;
+  mark* currentMarkFilm = NULL;
 
   /*
    * initialization
@@ -228,28 +100,52 @@ int* kNearestNeighboors(int user, int k) {
 
   for (int i = 0; i < k; i++) bestValues[i] = -2.0;
 
-  /*
-   * get all neighboors
-   */
-
-  neighboors = findNeighboors(user);
+  for (int i = 0; i < NB_USERS; i++) usersAlreadyDone[i] = 0;
 
   /*
-   * get all neighboors and all pearson values
+   * finding the k nearest neighboors
    */
 
-  for (int i = 1; i < neighboors[0]; i++) {
+  // chained list of the films rated by the user 
+  filmsRatedbyUser = Users[user-1];
+  currentMarkUser = filmsRatedbyUser != NULL ? filmsRatedbyUser->head : NULL;
 
-    pearsonSimilarityValue = pearsonSimilarityBetweenUsers(user, neighboors[i]);
-    
-    minIndex = argmin(bestValues, k);
+  while (currentMarkUser != NULL) {
 
-    if (pearsonSimilarityValue >= bestValues[minIndex]) {
+    // for each film rated by the user, we define the chained list of users who has rated this film 
+    usersWhoRatedFilm = Films[currentMarkUser->idFilm-1];
+    currentMarkFilm = usersWhoRatedFilm != NULL ? usersWhoRatedFilm->head : NULL;
 
-      bestValues[minIndex] = pearsonSimilarityValue;
-      bestUsers[minIndex] = neighboors[i];
+    while (currentMarkFilm != NULL) {
+      
+      if (!usersAlreadyDone[currentMarkFilm->idUser-1] && currentMarkFilm->idUser != user) {
+
+        // updating the number of neighboors
+        nbNeighboors++;
+
+        // mark the user as already treated */
+        usersAlreadyDone[currentMarkFilm->idUser-1] = 1;
+
+        // compute the similarity value
+        similarityValue = similarityBetweenUsers(user, currentMarkFilm->idUser);
+        
+        // finding the index of the minimum value of the list bestvalues
+        minIndex = argmin(bestValues, k);
+
+        if (similarityValue >= bestValues[minIndex]) {
+
+          bestValues[minIndex] = similarityValue;
+          bestUsers[minIndex] = currentMarkFilm->idUser;
+
+        }
+
+      }
+
+      currentMarkFilm = currentMarkFilm->sameFilm;
 
     }
+
+    currentMarkUser = currentMarkUser->sameUser;
 
   }
 
@@ -257,8 +153,7 @@ int* kNearestNeighboors(int user, int k) {
    * detect error
    */
   
-  if (neighboors[0] < k) {
-    free(neighboors);
+  if (nbNeighboors < k) {
     free(bestUsers);
     throwError("Number of neighboors higher than it can be");
   }
@@ -273,7 +168,6 @@ int* kNearestNeighboors(int user, int k) {
    * end & return
    */
 
-  free(neighboors);
   return bestUsers;
 
 }

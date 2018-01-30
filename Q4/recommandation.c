@@ -2,7 +2,7 @@
  * INCLUDES
  */
 
-#include "lib.h"
+#include "../lib.h"
 
 /*
  * FUNCTIONS
@@ -23,6 +23,7 @@ int estimatedMark(int film, int user, int k) {
 
   int* neighboors = NULL;
   int neighboorMark = 0;
+
   double similarity = 0.0;
   double weightedMarks = 0.0;
   double totalSimilarity = 0.0;
@@ -43,10 +44,10 @@ int estimatedMark(int film, int user, int k) {
 
     if (neighboorMark) {
 
-      similarity = pearsonSimilarityBetweenUsers(user, neighboors[i]);
+      similarity = similarityBetweenUsers(user, neighboors[i]);
       weightedMarks += similarity * neighboorMark;
       totalSimilarity += similarity > 0 ? similarity : -1.0 * similarity;
-      printf("%f %f\n ",similarity, totalSimilarity);
+      // printf("%f %f\n ",similarity, totalSimilarity);
 
     }    
 
@@ -116,38 +117,34 @@ int* mostPopularFilms(int X) {
  * @param user
  * @return
  */
-int reco1(int film, int user) {
+int predict(int user, int film) {
 
   /*
    * variables
    */
 
-  int* neighboors = NULL;
-  // int neighboor = 0;
-  int nbNeighboors = 0;
+  int realMark = 0;
+  int k = 0;
 
   /*
-   * compute number of neighboors
+   * check if the user has already rated or not
    */
 
-  neighboors = findNeighboors(user);
-  
-  nbNeighboors = neighboors[0];
+  realMark = searchMark(user, film);
 
+  if (realMark) return realMark;
 
   /*
-  
-  while (neighboor != 0 && nbNeighboors < NB_USERS-1) {
-    nbNeighboors++;
-    neighboor = neighboors[0];
-  }
-  */
+   * setting k
+   */
+
+  k = 5;
+
   /*
    * end & return
    */
 
-  free(neighboors);
-  return estimatedMark(film, user, round(sqrt(nbNeighboors)));
+  return estimatedMark(film, user, k);
 
 }
 
@@ -155,7 +152,7 @@ int reco1(int film, int user) {
  * TODO
  * @param user
  */
-void reco2(int user) {
+void top10(int user) {
 
   /*
    * variables
@@ -178,9 +175,9 @@ void reco2(int user) {
 
   for (int i = 0; i < NB_FILMS; i++) {
 
-    if (searchMark(user, i+1) == 0) {
+    if (!searchMark(user, i+1)) {
       
-      predictedMark = reco1((i+1), user);
+      predictedMark = predict(user, (i+1));
       
       minIndex = argmin(bestMarks, 10);
 
@@ -205,8 +202,8 @@ void reco2(int user) {
    * end & display
    */
 
-  printf("RECOMMANDATION :\n");
-  for (int i = 0; i < 10; i++) printf("Film n°%d : %d;\tMark=%d\n", (i+1), bestFilms[i], (int) bestMarks[i]);
+  printf("TOP TEN :\n");
+  for (int i = 0; i < 10; i++) printf("Film n°%d : %d\n", (i+1), bestFilms[i]);
 
 }
 
@@ -214,7 +211,7 @@ void reco2(int user) {
  * TODO
  * @param X
  */
-void reco3(int X) {
+void filePrediction(int X) {
   
   /*
    * variables
@@ -278,7 +275,7 @@ void reco3(int X) {
       strcat(outputLine, token);
       strcat(outputLine, ",");
 
-      sprintf(predictedMark, "%d", reco1(idFilm, idUser));
+      sprintf(predictedMark, "%d", predict(idFilm, idUser));
       strcat(outputLine, predictedMark);
 
       strcat(outputLine, "\n");
@@ -297,25 +294,3 @@ void reco3(int X) {
   fclose(outputFile);
 
 }
-
-/* MAIN */
-/*
-int main(int argc, char* argv[]) {
-
-  initializeUsers();
-  initializeFilms();
-
-  for (int i = 1; i < argc; i++) readData(argv[i]);
-
-  int* films = mostPopularFilms(20);
-
-  for (int i = 0; i < 20; i++) printf("Film n°%d : %d\n", i+1, films[i]);
-  
-  free(films);
-
-  freeMemory();
-
-  return 0;
-
-}
-*/

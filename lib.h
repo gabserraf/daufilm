@@ -47,7 +47,7 @@ list* Users[NB_USERS];
  * FUNCTIONS
  */
 
-/* auxiliaries.c */
+// auxiliaries.c 
 
 mark* initializeMark(int markValue, int idFilm, int idUser);
 list* initializeList();
@@ -68,33 +68,33 @@ int isNumber(char* chr);
 int getNumberMarks();
 void freeMemory();
 
-/* extractData.c */
+// extractData.c 
 
 void initializeUsers();
 void initializeFilms();
 void readData(char filename[T_MAX]);
 void createDataFile();
 
-/* knn-algorithms.c */
+// knn-algorithms.c 
 
-double centeredDotProduct(int* x, int* y);
-double centeredNorm(int* x);
-double pearsonSimilarity(int* x, int* y);
-double pearsonSimilarityBetweenUsers(int user1, int user2);
-int numberOfFilmsInCommon(int user1, int user2);
-int* findNeighboors(int user);
+double similarityBetweenUsers(int user1, int user2);
 int* kNearestNeighboors(int user, int k);
 
-/* pgmView.c */
+// pgmView.c 
 
 void createPGM(int user, int k);
 
-/* recommandation.c */
+// recommandation.c 
 
 int estimatedMark(int film, int user, int k);
-int reco1(int film, int user);
-void reco2(int user);
-void reco3(int X);
+int predict(int user, int film);
+void top10(int user);
+void filePrediction(int X);
+
+// crossValidation.c
+
+double RMSE(int* predictedValues, int* trueValues, int size);
+double crossValidation(double perc);
 
 /*
  * END

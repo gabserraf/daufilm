@@ -27,14 +27,20 @@ void showHelp() {
   printf("\t => allows to find the k nearest neighboors of the given user\n");
   printf("- pgm <user> <k>\n");
   printf("\t => allows to create a .pgm file which shows the similarity matrix between the given user and its k nearest neighboors\n");
+  printf("- reco1 <user> <film>\n");
+  printf("\t => predicts the mark that the given user would give to the given film \n");
+  printf("- reco2 <user>\n");
+  printf("\t => predicts the top 10 of the films the given user would rather see \n");
+  printf("- reco3 <X>\n");
+  printf("\t => take the file inputX.txt and predits all missing marks in the outputX.txt file \n");
   exit(0);
 
 }
 
 /**
  * TODO
- * @params argc
- * @params argv
+ * @param argc
+ * @param argv
  */
 void extractData(int argc, char* argv[]) {
 
@@ -84,8 +90,8 @@ void extractData(int argc, char* argv[]) {
 
 /**
  * TODO
- * @params argc
- * @params argv
+ * @param argc
+ * @param argv
  */
 void knn(int argc, char* argv[]) {
 
@@ -122,8 +128,8 @@ void knn(int argc, char* argv[]) {
    */
 
   if (isNumber(argv[2])) user = atoi(argv[2]);
-  else throwError("User must be an integer");
-  if (user > NB_USERS) throwError("User must lower than max");
+  else throwError("user must be an integer");
+  if (user > NB_USERS) throwError("user must lower than max");
 
   /*
    * getting k
@@ -168,8 +174,8 @@ void knn(int argc, char* argv[]) {
 
 /**
  * TODO
- * @params argc
- * @params argv
+ * @param argc
+ * @param argv
  */
 void pgm(int argc, char* argv[]) {
 
@@ -204,8 +210,8 @@ void pgm(int argc, char* argv[]) {
    */
 
   if (isNumber(argv[2])) user = atoi(argv[2]);
-  else throwError("User must be an integer");
-  if (user > NB_USERS) throwError("User must lower than max");
+  else throwError("user must be an integer");
+  if (user > NB_USERS) throwError("user must lower than max");
 
   /*
    * getting k
@@ -219,6 +225,184 @@ void pgm(int argc, char* argv[]) {
    */
 
   createPGM(user, k);
+
+}
+
+/**
+ * TODO
+ * @param argc
+ * @param argv
+ */
+void reco1(int argc, char* argv[]) {
+
+  /*
+   * variables
+   */
+
+  int user = 0;
+  int film = 0;
+  int show = 0;
+  int rate = 0;
+
+  /*
+   * initialization
+   */
+
+  initializeUsers();
+  initializeFilms();
+
+  /*
+   * reading data
+   */
+
+  readData("data.txt");
+
+  /*
+   * lake of arguments --> error 
+   */
+
+  if (argc < 4) showHelp();
+
+  /*
+   * getting user
+   */
+   
+  if (isNumber(argv[2])) user = atoi(argv[2]);
+  else throwError("user must be an integer");
+  if (user > NB_USERS) throwError("user must lower than max");
+
+  /*
+   * getting film
+   */
+
+  if (isNumber(argv[3])) film = atoi(argv[3]);
+  else throwError("film must be an integer");
+  if (film > NB_FILMS) throwError("film must lower than max");
+
+  /*
+   * getting show
+   */
+
+  if (argc >= 5 && strcmp(argv[4], "--show") == 0) show = 1;
+
+  /*
+   * computing recommandation 1 (prediction)
+   */
+
+  rate = predict(user, film);
+
+  /*
+   * showing result
+   */
+
+  if (show) {
+
+    printf("=== RECOMMANDATION 1 ===\n");
+
+    printf("The user %d may rate the film %d as : %d\n", user, film, rate);
+
+    printf("=== END ===\n");
+
+  }
+
+}
+
+/**
+ * TODO
+ * @param argc
+ * @param argv
+ */
+void reco2(int argc, char* argv[]) {
+
+  /*
+   * variables
+   */
+
+  int user = 0;
+
+  /*
+   * initialization
+   */
+
+  initializeUsers();
+  initializeFilms();
+
+  /*
+   * reading data
+   */
+
+  readData("data.txt");
+
+  /*
+   * lake of arguments --> error 
+   */
+
+  if (argc < 3) showHelp();
+
+  /*
+   * getting user
+   */
+   
+  if (isNumber(argv[2])) user = atoi(argv[2]);
+  else throwError("user must be an integer");
+  if (user > NB_USERS) throwError("user must lower than max");
+
+  /*
+   * computing recommandation 2 (top 10)
+   */
+
+  printf("=== RECOMMANDATION 2 ===\n");
+
+  top10(user);
+
+  printf("=== END ===\n");
+
+}
+
+/**
+ * TODO
+ * @param argc
+ * @param argv
+ */
+void reco3(int argc, char* argv[]) {
+
+  /*
+   * variables
+   */
+
+  int X = 0;
+
+  /*
+   * initialization
+   */
+
+  initializeUsers();
+  initializeFilms();
+
+  /*
+   * reading data
+   */
+
+  readData("data.txt");
+
+  /*
+   * lake of arguments --> error 
+   */
+
+  if (argc < 3) showHelp();
+
+  /*
+   * getting user
+   */
+   
+  if (isNumber(argv[2])) X = atoi(argv[2]);
+  else throwError("X must be an integer");
+
+  /*
+   * computing recommandation 3 (file prediction)
+   */
+
+  filePrediction(X);
 
 }
 
@@ -251,24 +435,28 @@ int main(int argc, char* argv[]) {
 
     strcpy(command, argv[1]);
 
-    /* extractData command */
-    
+    // extractData command 
     if (strcmp(command, "extractData") == 0) extractData(argc, argv);
 
-    /* knn command */
-
+    // knn command 
     else if (strcmp(command, "knn") == 0) knn(argc, argv);
 
-    /* pgm command */
-
+    // pgm command 
     else if (strcmp(command, "pgm") == 0) pgm(argc, argv);
 
-    /* recommandation command */
+    // recommandation 1 command (prediction) 
+    else if (strcmp(command, "reco1") == 0) reco1(argc, argv);
 
-    // else if (strcmp(command, "recommandation") == 0) pgm(argc, argv);
+    // recommandation 2 command (top 10)
+    else if (strcmp(command, "reco2") == 0) reco2(argc, argv);
 
-    /* help command */
+    // recommandation 3 command (file prediction)
+    else if (strcmp(command, "reco3") == 0) reco3(argc, argv);
 
+    // cross-validation command
+    // else if (strcmp(command, "cv") == 0) cv(argc, argv);
+
+    // help command 
     else showHelp();
 
   }
@@ -289,7 +477,7 @@ int main(int argc, char* argv[]) {
    * end
    */
 
-  printf("Done in %f s\n", (double) (endTime - startTime)/CLOCKS_PER_SEC);
+  printf("Done in %.3f s\n", (double) (endTime - startTime)/CLOCKS_PER_SEC);
 
   return 0;
 
